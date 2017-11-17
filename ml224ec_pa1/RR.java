@@ -100,7 +100,7 @@ public class RR{
 		
 		// Uncomment these for more output verbosity
 		//printProcesses();
-		printGanttChart();
+		//printGanttChart();
 	}
 
 	public void printProcesses() {
