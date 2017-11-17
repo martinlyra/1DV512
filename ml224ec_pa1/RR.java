@@ -72,7 +72,7 @@ public class RR{
 			if (p == null)
 			{
 				ct++;
-				eventList.add(String.format("IDLE\t| %d - %d", ct-1, ct));
+				eventList.add(String.format(";%d;%d", ct-1, ct));
 				continue;
 			}
 			// else, we've got a process to work on
@@ -86,7 +86,7 @@ public class RR{
 			
 			p.setRemainingBurstTime(bt - act);
 			
-			eventList.add(String.format("P%d\t| %d - %d", p.getProcessId(), ct - act, ct));
+			eventList.add(String.format("%d;%d;%d", p.getProcessId(), ct - act, ct));
 			
 			// If process is completed, compile the statistics
 			if (p.getRemainingBurstTime() < 1)
@@ -100,7 +100,7 @@ public class RR{
 		
 		// Uncomment these for more output verbosity
 		//printProcesses();
-		//printGanttChart();
+		printGanttChart();
 	}
 
 	public void printProcesses() {
@@ -122,11 +122,52 @@ public class RR{
 		System.out.print(sb.toString());
 	}
 
-	public void printGanttChart(){
-		// Not an actual chart displayed on an external window/graphing library
-		// Displays as a 2-column list instead
-		System.out.println("Gantt's Chart (list form)");
-		for (String str : eventList)
-			System.out.println(str);
+	public void printGanttChart(){		
+		ArrayList<String> list = (ArrayList<String>) eventList.clone();
+		
+		StringBuilder output = new StringBuilder();
+		
+		ArrayList<StringBuilder> lines = new ArrayList<StringBuilder>();
+		for (int i = 0; i < processes.size(); i++)
+			lines.add(new StringBuilder());
+		
+		// Every dot = 1 time unit, comma for each 5th time unit
+		output.append(String.format("TQ = %d\t. ....,....,....,....,....,....,....,\n", tq));
+		
+		for (String str : list)
+		{
+			if (str.startsWith(";")) continue; // Do not parse IDLE procs
+			
+			String[] parts = str.split(";");
+			int id = Integer.parseInt(parts[0]);
+			StringBuilder sb = lines.get(id-1);
+			
+			int t0 = Integer.parseInt(parts[1]);
+			int t1 = Integer.parseInt(parts[2]);
+			
+			for (int i = sb.length(); i < t1; i++)
+				if (i >= t0 && i < t1)
+					sb.append("=");
+				else if ((i+1) % 5 == 0) // We would like have some nice formatting too (line for every 5th unoccupied space)...
+					sb.append("|");
+				else
+					sb.append(" ");
+		}
+		
+		// Post parsing formatting
+		for (StringBuilder sb : lines)
+			for (int i = sb.length(); i < 35; i++)
+			{
+				if ((i+1) % 5 == 0)
+					sb.append("|");
+				else 
+					sb.append(" ");
+			}
+		
+		for (int i = 0; i < lines.size(); i++)
+			output.append(String.format("PID %d\t: %s\n", i+1, lines.get(i).toString()));
+		output.append('\n');
+		
+		System.out.println(output);
 	}
 }
