@@ -14,7 +14,6 @@ public class DiningPhilosopher {
 	 * 		philosopher # picked up his left chopstick (chopstick #) 
 	 */
 	public boolean DEBUG = false;
-	public boolean RESOLVE_DEADLOCKS = false;
 	private final int NUMBER_OF_PHILOSOPHERS = 5;
 	private int SIMULATION_TIME = 10000;
 	private int SEED = 0;
@@ -23,6 +22,10 @@ public class DiningPhilosopher {
 	ArrayList<Philosopher> philosophers = null;
 	ArrayList<ChopStick> chopSticks = null;
 	
+	/*
+	 * Addition made for detecting deadlocks
+	 */
+	public boolean RESOLVE_DEADLOCKS = false; // aborts simulation when false when a deadlock is found
 	DeadlockResolver deadlockResolver = null;
 	boolean stopping = false;
 
@@ -62,13 +65,7 @@ public class DiningPhilosopher {
 					System.currentTimeMillis() - ts < SIMULATION_TIME && !stopping;)
 				Thread.sleep(5);
 
-			
-			/*	TODO
-			 *  Stop all philosophers.
-			 *  Add comprehensive comments to explain your implementation.
-			 */
-			
-			executorService.shutdownNow();
+			executorService.shutdownNow(); // Interrupt all threads
 
 		} finally {
 			executorService.shutdown();
@@ -86,15 +83,10 @@ public class DiningPhilosopher {
 		//create the executor service
 		executorService = Executors.newFixedThreadPool(NUMBER_OF_PHILOSOPHERS + 1);
 		
-		/* TODO
-		 * Add chopsticks,
-		 * Add philosophers, and
-		 * Assign the corresponding chopsticks.
-		 * Add comprehensive comments to explain your implementation.
-		 */
-		
+		// Add chopsticks
 		for (int i = 0; i < NUMBER_OF_PHILOSOPHERS; i++)
 			chopSticks.add(new ChopStick(i));
+		// Then add Philosophers and assign the sticks to them
 		for (int i = 0; i < NUMBER_OF_PHILOSOPHERS; i++)
 		{
 			ChopStick c0 = chopSticks.get(i);
@@ -131,6 +123,10 @@ public class DiningPhilosopher {
 		System.out.println("---------------------------------------------------\n");
 	}
 
+	/**
+	 * Extension for DeadlockResolver, a function to stop the simulation whenever
+	 * a deadlocks occurs
+	 */
 	public void stop()
 	{
 		stopping = true;

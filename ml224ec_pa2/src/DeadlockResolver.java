@@ -3,6 +3,7 @@ import java.util.ArrayList;
 /**
  * Runnable service for detecting and resolving deadlocks. Can be configured
  * to abort simulation instead of trying to dissolve deadlocks.
+ * Technically, it does NOT prevent deadlocks, rather preventing them to persist.
  * 
  * Has to be run on a separate thread.
  * @author Martin Lyrå
